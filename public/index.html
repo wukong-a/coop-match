@@ -305,7 +305,7 @@
         每多一个节点，网络就多一分匹配速度。自建节点会出现在全网「节点荣誉榜」上，
         你促成的每一局跨节点配对都会被记录。一台低配云服务器、NAS、树莓派都能跑：
       </p>
-      <div id="deployCmd" style="background:rgba(127,127,127,.12);border-radius:8px;padding:8px 10px;font-family:Consolas,monospace;font-size:11.5px;line-height:1.7;overflow-x:auto;white-space:nowrap;">git clone 本项目 &amp;&amp; cd it2-match<br>npm install<br>SIGNING=1 PORT=3001 NODE_NAME="你的节点名" HUB_URL=<span id="cmdHubUrl"></span> npm start</div>
+      <div id="deployCmd" style="background:rgba(127,127,127,.12);border-radius:8px;padding:8px 10px;font-family:Consolas,monospace;font-size:11.5px;line-height:1.7;overflow-x:auto;white-space:nowrap;">git clone https://github.com/wukong-a/coop-match.git &amp;&amp; cd coop-match<br>npm install<br>SIGNING=1 PORT=3001 NODE_NAME="你的节点名" HUB_URL=<span id="cmdHubUrl"></span> npm start</div>
       <p style="margin:6px 0 0;line-height:1.7;font-size:12px;">
         <b>SIGNING=1</b> 会让节点生成一对 Ed25519 密钥，跨节点配对时由双方各自签名存证——
         这样「荣誉榜上的数字」就不是枢纽单方面说了算，而是任何人都能复核的。存证里只有游戏名、时间和节点身份，<b>不含任何玩家信息</b>。
