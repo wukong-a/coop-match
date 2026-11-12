@@ -1,0 +1,1 @@
+{"dependencies":{"express":"^4.21.0","ws":"^8.18.0"},"description":"联机游戏搭子随机匹配工具（多游戏 + 联邦网络 + 预约板 + 节点留言板 + 签名存证）","engines":{"node":">=18"},"license":"MIT","main":"server.js","name":"coop-match","private":false,"scripts":{"dev":"node server.js","start":"node server.js","verify":"node scripts/verify-attestation.js --selftest"},"version":"3.7.0"}

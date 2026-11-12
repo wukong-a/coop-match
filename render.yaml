@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: coop-match
+    env: node
+    plan: free
+    buildCommand: npm install --production
+    startCommand: node server.js
+    healthCheckPath: /api/info
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: HUB_URL
+        value: https://yx.niuniu94.xyz
+      - key: NODE_NAME
+        value: 联机搭子

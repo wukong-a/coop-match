@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yx.niuniu94.xyz/sitemap.xml

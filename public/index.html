@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>联机搭子 · 双人成行/双影奇境/胡闹厨房随机匹配</title>
+<meta name="description" content="联机搭子：免登录找人一起玩双人成行、双影奇境、胡闹厨房、逃出生天等双人合作游戏。随机匹配、预约组队、联邦节点互通，不存数据，打开就能玩。">
+<meta name="keywords" content="联机搭子,双人成行,双影奇境,胡闹厨房,逃出生天,双人游戏,联机匹配,找队友,合作游戏">
+<meta property="og:title" content="联机搭子 · 随机匹配">
+<meta property="og:description" content="免登录找人一起玩双人合作游戏：双人成行、双影奇境、胡闹厨房等。随机匹配、预约组队，打开就能玩。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://yx.niuniu94.xyz/">
+<style>
+  :root {
+    --bg: #f6f4ef; --card: #ffffff; --ink: #2b2620; --sub: #7a7268;
+    --accent: #e8582a; --accent-dark: #c94517; --line: #e8e2d8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: var(--bg); color: var(--ink);
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+  }
+  .wrap { width: 100%; max-width: 620px; padding: 12px 16px 36px; }
+  header { text-align: center; margin: 8px 0 0; }
+  header h1 { font-size: 22px; letter-spacing: 1px; }
+  header p { color: var(--sub); margin-top: 4px; font-size: 13px; }
+  .share-btn {
+    display: inline-flex; align-items: center; gap: 4px; margin-top: 10px;
+    padding: 7px 16px; border: 1px solid var(--accent); border-radius: 20px;
+    background: #fdf1ec; color: var(--accent); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+  }
+  .share-btn:hover { background: var(--accent); color: #fff; }
+
+  .stats { display: flex; gap: 6px; margin: 10px 0; overflow-x: auto; scrollbar-width: none; }
+  .stats::-webkit-scrollbar { display: none; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 4px 10px; font-size: 12.5px; color: var(--sub); white-space: nowrap; flex-shrink: 0; }
+  .stat b { color: var(--accent); }
+
+  .tabs { display: flex; gap: 6px; margin: 10px 0; }
+  .tabs button {
+    flex: 1; padding: 10px 6px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--card); font-size: 14px; cursor: pointer; color: var(--sub); font-weight: 600;
+  }
+  .tabs button.active { border-color: var(--accent); color: var(--accent); background: #fdf1ec; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; box-shadow: 0 4px 16px rgba(43,38,32,.05); margin-bottom: 10px; }
+  .field { margin-bottom: 10px; }
+  .field > label { display: block; font-size: 12.5px; color: var(--sub); margin-bottom: 4px; }
+  .field input[type=text], .field select {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px;
+    font-size: 14px; background: #fbfaf7; color: var(--ink); outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .pick {
+    padding: 7px 4px; border: 1px solid var(--line); border-radius: 9px;
+    background: #fbfaf7; cursor: pointer; font-size: 12.5px; color: var(--ink); text-align: center; transition: all .15s;
+  }
+  .pick small { display: block; color: var(--sub); font-size: 10px; margin-top: 1px; }
+  .pick.active { border-color: var(--accent); color: var(--accent); background: #fdf1ec; font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    padding: 5px 11px; border: 1px solid var(--line); border-radius: 16px;
+    background: #fbfaf7; cursor: pointer; font-size: 12.5px; color: var(--sub);
+  }
+  .chip.active { border-color: var(--accent); color: var(--accent); background: #fdf1ec; }
+  .mic-row { display: flex; align-items: center; gap: 7px; font-size: 13px; cursor: pointer; }
+  .mic-row input { width: 16px; height: 16px; accent-color: var(--accent); }
+  /* 是否有本体：二选一分段控件 */
+  .seg { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    flex: 1; padding: 7px 4px; border: none; background: #fbfaf7; color: var(--sub);
+    font-size: 12.5px; cursor: pointer; transition: all .15s;
+  }
+  .seg button.active { background: var(--accent); color: #fff; font-weight: 600; }
+  .seg-label { font-size: 12px; color: var(--sub); margin-bottom: 4px; display: block; }
+  .own-badge { display: inline-block; padding: 1px 6px; border-radius: 6px; font-size: 11.5px; margin-left: 6px; }
+  .own-badge.own { background: rgba(90,150,90,.15); color: #4a7c4a; }
+  .own-badge.pass { background: rgba(200,150,60,.16); color: #98702a; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .btn { width: 100%; padding: 12px; border: none; border-radius: 11px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s; margin-top: 4px; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-ghost { background: transparent; color: var(--sub); border: 1px solid var(--line); }
+  .btn-ghost:hover { color: var(--ink); }
+
+  .hidden { display: none !important; }
+  .center { text-align: center; }
+  .spinner { width: 46px; height: 46px; border: 4px solid var(--line); border-top-color: var(--accent); border-radius: 50%; margin: 18px auto; animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .queue-tip { color: var(--sub); font-size: 14px; margin: 6px 0 16px; }
+
+  .partner-card { text-align: center; }
+  .partner-card h2 { font-size: 20px; margin-bottom: 2px; }
+  .partner-card .match-seq { display: inline-block; font-size: 12px; color: #f0b060; background: rgba(240,176,96,.12); border: 1px solid rgba(240,176,96,.35); border-radius: 12px; padding: 3px 10px; margin: 6px 0 8px; }
+  .partner-card .meta { color: var(--sub); font-size: 13px; margin-bottom: 14px; }
+  .id-box {
+    background: #fbfaf7; border: 1px dashed var(--line); border-radius: 12px;
+    padding: 14px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .id-box .val { font-size: 17px; font-weight: 600; word-break: break-all; text-align: left; }
+  .copy-btn { flex-shrink: 0; border: none; background: var(--accent); color: #fff; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-size: 13px; }
+  .guide {
+    text-align: left; background: #fdf6ee; border: 1px solid #f0e3d0; border-radius: 12px;
+    padding: 14px 16px; margin: 14px 0; font-size: 13px; line-height: 1.8; color: #6b5d4a;
+  }
+  .guide b { color: var(--accent-dark); }
+
+  /* 预约板 */
+  .booking-item { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 10px; background: #fdfcf9; }
+  .booking-item.full { opacity: .65; }
+  .bk-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .bk-title { font-weight: 700; font-size: 15px; }
+  .bk-title .cap { color: var(--accent); font-size: 13px; margin-left: 6px; }
+  .bk-meta { color: var(--sub); font-size: 12px; margin-top: 4px; }
+  .bk-tags { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .bk-tag { font-size: 11px; background: #f3efe7; color: #8a8072; border-radius: 10px; padding: 2px 8px; }
+  .bk-owner { font-size: 12px; color: var(--sub); margin-top: 8px; word-break: break-all; }
+  .bk-owner b { color: var(--ink); }
+  .bk-members { font-size: 12px; color: var(--green, #2e9e5b); margin-top: 4px; word-break: break-all; }
+  .bk-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .bk-actions button { flex: 1; padding: 9px; border-radius: 9px; font-size: 13px; cursor: pointer; border: none; font-weight: 600; }
+  .bk-join { background: var(--accent); color: #fff; }
+  .bk-join:disabled { background: #d8d2c8; cursor: not-allowed; }
+  .bk-report { background: transparent; border: 1px solid var(--line) !important; color: var(--sub); font-weight: 400 !important; }
+  .empty-tip { text-align: center; color: var(--sub); font-size: 14px; padding: 22px 0; }
+
+  .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 24px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 9; }
+  .toast.show { opacity: .92; }
+  footer { margin-top: 16px; color: var(--sub); font-size: 12px; text-align: center; line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🎮 联机搭子 · 随机匹配</h1>
+    <p>找搭子一起开黑 —— 免登录 · 不存数据 · 用完即走</p>
+    <button class="share-btn" id="shareBtn">📣 分享给搭子，匹配更快</button>
+  </header>
+  <noscript>
+    <div style="padding:16px;line-height:1.8;font-size:14px;">
+      <p>联机搭子是一个免登录的双人合作游戏匹配工具，帮你找到一起玩游戏的搭子。</p>
+      <p>支持的游戏：双人成行、双影奇境、逃出生天、传送门2、胡闹厨房2、深岩银河、恐鬼症、森林之子、饥荒联机版、英灵神殿、幻兽帕鲁、博德之门3、求生之路2，以及玩家投票收录的更多游戏。</p>
+      <p>玩法：选游戏、选平台，点开始匹配，系统会把同样在排队的人配成一对；也可以发预约，约好时间一起玩。支持 Steam、EA App、Epic、PS、Xbox、Switch 等平台。任何人都可以自建节点加入联邦网络，所有节点共用一个匹配池。</p>
+      <p>本站免登录，不收集个人信息，不保存聊天记录。请开启 JavaScript 后使用完整功能。</p>
+    </div>
+  </noscript>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="tabs">
+    <button id="tabMatch" class="active">⚡ 匹配</button>
+    <button id="tabBoard">📋 预约</button>
+    <button id="tabMsg">💬 留言</button>
+  </div>
+
+  <!-- ============ 即时匹配 ============ -->
+  <div id="matchPane">
+    <!-- 大厅 -->
+    <div class="card" id="lobby">
+      <div class="field">
+        <label>选择游戏</label>
+        <div class="grid3" id="games"></div>
+      </div>
+      <div class="field">
+        <label>你的平台（不同平台之间可能无法联机）</label>
+        <div class="grid3" id="platforms"></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>你的昵称</label>
+          <input type="text" id="nick" maxlength="12" placeholder="比如：沙发土豆">
+        </div>
+        <div class="field">
+          <label id="idLabel">好友 ID / 好友码</label>
+          <input type="text" id="gameId" maxlength="40" placeholder="对方用它加你好友">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>当前进度（选填）</label>
+          <input type="text" id="chapter" maxlength="16" placeholder="第一章 / 10小时">
+        </div>
+        <div class="field" style="display:flex;flex-direction:column;justify-content:flex-end;gap:5px;padding-bottom:6px;">
+          <div>
+            <span class="seg-label">游戏本体</span>
+            <div class="seg" id="ownSeg">
+              <button type="button" data-own="own" class="active">我有本体</button>
+              <button type="button" data-own="pass">仅通行证</button>
+            </div>
+          </div>
+          <label class="mic-row" style="cursor:pointer;"><input type="checkbox" id="mic" checked> 我有麦克风</label>
+        </div>
+      </div>
+      <p id="ownHint" class="hidden" style="font-size:12px;color:var(--sub);margin:-2px 0 8px;line-height:1.6;">
+        🎟 好友通行证：只需搭子有本体，你就能免费跟你玩完整流程——系统会优先给你配「有本体」的搭子。
+      </p>
+      <button class="btn btn-primary" id="startBtn">开始匹配</button>
+    </div>
+
+    <!-- 排队中 -->
+    <div class="card center hidden" id="queuing">
+      <div class="spinner"></div>
+      <h2 style="font-size:18px;" id="queueTitle">正在为你寻找搭子…</h2>
+      <p class="queue-tip">保持本页面打开，配对成功会立即提示</p>
+      <button class="btn btn-ghost" id="cancelBtn">取消匹配</button>
+    </div>
+
+    <!-- 配对成功 -->
+    <div class="card partner-card hidden" id="matched">
+      <h2>🎉 搭子找到了！</h2>
+      <div class="match-seq" id="matchSeq" style="display:none;"></div>
+      <div class="meta" id="partnerMeta"></div>
+      <div class="id-box">
+        <div class="val" id="partnerId"></div>
+        <button class="copy-btn" id="copyBtn">复制 ID</button>
+      </div>
+      <div class="guide" id="guideBox"></div>
+      <button class="btn btn-primary" id="doneBtn">玩完啦，返回大厅</button>
+      <button class="btn btn-ghost" id="shareBtn2" style="margin-top:8px;font-size:14px;">📣 分享给更多搭子，人越多匹配越快</button>
+      <button class="btn btn-ghost" id="reportBtn" style="margin-top:8px;font-size:14px;">举报这位搭子（骚扰/广告/爷新）</button>
+    </div>
+  </div>
+
+  <!-- ============ 预约留言板 ============ -->
+  <div id="boardPane" class="hidden">
+    <div class="card">
+      <div class="field">
+        <label>选择游戏</label>
+        <select id="bkGame"></select>
+      </div>
+      <div class="field">
+        <label>平台</label>
+        <select id="bkPlatform"></select>
+      </div>
+      <div class="field">
+        <label>预约时段</label>
+        <select id="bkSlot"></select>
+      </div>
+      <div class="field grid2">
+        <div>
+          <label>已有几人<span id="bkSizeHint" style="color:var(--sub);font-size:11px;"></span></label>
+          <select id="bkHave"></select>
+        </div>
+        <div>
+          <label>还缺几人</label>
+          <select id="bkNeed"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>组局风格（选填，最多 4 个）</label>
+        <div class="chips" id="bkTags"></div>
+      </div>
+      <label class="mic-row"><input type="checkbox" id="bkMic" checked> 有麦克风</label>
+      <div class="field" style="margin-top:9px;">
+        <span class="seg-label">我的游戏本体</span>
+        <div class="seg" id="bkOwnSeg">
+          <button type="button" data-own="own" class="active">我有本体</button>
+          <button type="button" data-own="pass">仅通行证（求带）</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="bkPublishBtn">发布预约（自动带上我的昵称和好友 ID）</button>
+      <p style="font-size:12px;color:var(--sub);margin-top:8px;line-height:1.6;">
+        预约全程无需输入文字，所有选项固定；发布后 24 小时自动下架；每身份同时在架 1 条、每天最多 3 条；被举报 3 次将强制下架并禁止匹配。
+      </p>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:15px;margin-bottom:12px;">进行中的预约</h3>
+      <div id="bookingList"><div class="empty-tip">还没有预约，来发第一条吧</div></div>
+      <button class="btn btn-ghost" id="bkRefresh" style="font-size:14px;">刷新列表</button>
+    </div>
+  </div>
+
+  <!-- ============ 留言页（给节点主人留言 + 自建节点） ============ -->
+  <div id="msgPane" class="hidden">
+    <div class="card" id="msgBoard">
+      <h3 style="font-size:15px;margin-bottom:4px;">💬 给节点主人留言</h3>
+      <div id="motdBox" class="hidden" style="background:rgba(127,127,127,.12);border-radius:8px;padding:8px 12px;font-size:13px;margin:8px 0;line-height:1.6;"></div>
+      <p style="font-size:12px;color:var(--sub);margin:4px 0 8px;">感谢、吐槽、想玩什么游戏、哪里不好用，都可以说（60 字内）。</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;" id="msgChips"></div>
+      <textarea id="msgText" maxlength="60" rows="2" placeholder="写点想对节点主人说的话（60 字内，不能带链接）" style="width:100%;box-sizing:border-box;border:1px solid rgba(127,127,127,.35);border-radius:8px;padding:8px 10px;font-size:13px;background:transparent;color:inherit;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+        <button class="btn btn-primary" id="msgSend" style="font-size:14px;">发送留言</button>
+        <span id="msgCount" style="font-size:12px;color:var(--sub);">0/60</span>
+      </div>
+      <div id="msgList" style="margin-top:12px;"></div>
+    </div>
+
+    <details style="border:1px dashed var(--line,#ddd);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--sub);">
+      <summary style="cursor:pointer;font-weight:600;color:var(--fg,#333);">⚡ 自己部署一个节点，为网络出力</summary>
+      <p style="margin:8px 0 6px;line-height:1.7;">
+        每多一个节点，网络就多一分匹配速度。自建节点会出现在全网「节点荣誉榜」上，
+        你促成的每一局跨节点配对都会被记录。一台低配云服务器、NAS、树莓派都能跑：
+      </p>
+      <div id="deployCmd" style="background:rgba(127,127,127,.12);border-radius:8px;padding:8px 10px;font-family:Consolas,monospace;font-size:11.5px;line-height:1.7;overflow-x:auto;white-space:nowrap;">git clone 本项目 &amp;&amp; cd it2-match<br>npm install<br>SIGNING=1 PORT=3001 NODE_NAME="你的节点名" HUB_URL=<span id="cmdHubUrl"></span> npm start</div>
+      <p style="margin:6px 0 0;line-height:1.7;font-size:12px;">
+        <b>SIGNING=1</b> 会让节点生成一对 Ed25519 密钥，跨节点配对时由双方各自签名存证——
+        这样「荣誉榜上的数字」就不是枢纽单方面说了算，而是任何人都能复核的。存证里只有游戏名、时间和节点身份，<b>不含任何玩家信息</b>。
+      </p>
+      <button class="btn btn-ghost" id="copyDeploy" style="margin-top:6px;font-size:12.5px;padding:9px;">📋 复制部署命令</button>
+      <span id="copyHint" style="font-size:12px;color:var(--sub);"></span>
+    </details>
+
+    <!-- 提名（投票收录新游戏）—— 用固定候选池代替自由输入 -->
+    <div class="card">
+      <h3 style="font-size:15px;margin-bottom:4px;">🗳 想玩什么游戏？投一票</h3>
+      <p style="font-size:12px;color:var(--sub);line-height:1.7;margin:4px 0 10px;">
+        候选是预设的固定列表（不接受自由输入，避免广告和同游戏多种写法把匹配池搅碎）。
+        同一款游戏凑够 <b id="nomThreshold">3</b> 票且来自多个玩家，节点主人就会把它加进匹配库。
+      </p>
+      <select id="nomSelect" style="width:100%;padding:10px 12px;font-size:15px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--ink);">
+        <option value="">加载中…</option>
+      </select>
+      <div id="nomDetail" style="margin-top:10px;"></div>
+      <button class="btn btn-ghost" id="nomRefresh" style="font-size:14px;">刷新票数</button>
+      <p style="font-size:12px;color:var(--sub);margin-top:10px;line-height:1.7;">
+        没看到你想要的游戏？就在上面的留言框里告诉节点主人，他会手动加进候选列表。
+      </p>
+    </div>
+  </div>
+
+  <footer>
+    <span id="nodeName"></span><br>
+    玩家社区作品，与游戏厂商无关 · 免登录 · 不存数据 · 任何人可自建节点加入联邦网络
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const PLATFORM_NAMES = { steam: 'Steam', ea: 'EA App', epic: 'Epic', ps: 'PS', xbox: 'Xbox', switch: 'Switch' };
+let GAMES = [];
+let myGame = null;      // 当前选中的游戏对象
+let myPlatform = null;
+let myOwn = localStorage.getItem('it2_own') === 'pass' ? 'pass' : 'own'; // 是否有游戏本体
+
+let ws = null;
+let state = 'idle';
+let reconnectTimer = null;
+let partnerKey = null;
+
+let myToken = localStorage.getItem('it2_token');
+if (!myToken) {
+  myToken = crypto.randomUUID ? crypto.randomUUID() : 't' + Date.now() + Math.random().toString(36).slice(2);
+  localStorage.setItem('it2_token', myToken);
+}
+
+const $ = id => document.getElementById(id);
+const views = { lobby: $('lobby'), queuing: $('queuing'), matched: $('matched') };
+
+function toast(text) {
+  const t = $('toast');
+  t.textContent = text;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+function show(name) {
+  for (const k in views) views[k].classList.toggle('hidden', k !== name);
+}
+
+/* ---------- 标签页 ---------- */
+const TAB_MAP = { match: ['tabMatch', 'matchPane'], board: ['tabBoard', 'boardPane'], msg: ['tabMsg', 'msgPane'] };
+function switchTab(name) {
+  for (const [k, [btn, pane]] of Object.entries(TAB_MAP)) {
+    $(btn).classList.toggle('active', k === name);
+    $(pane).classList.toggle('hidden', k !== name);
+  }
+  if (name === 'board') loadBookings();
+  if (name === 'msg') { loadMessages(); loadNominations(); }
+}
+$('tabMatch').addEventListener('click', () => switchTab('match'));
+$('tabBoard').addEventListener('click', () => switchTab('board'));
+$('tabMsg').addEventListener('click', () => switchTab('msg'));
+
+/* ---------- 是否有游戏本体 ---------- */
+function setOwn(v) {
+  myOwn = v === 'pass' ? 'pass' : 'own';
+  localStorage.setItem('it2_own', myOwn);
+  document.querySelectorAll('#ownSeg button').forEach(b => {
+    b.classList.toggle('active', b.dataset.own === myOwn);
+  });
+  $('ownHint').classList.toggle('hidden', myOwn !== 'pass');
+  // 预约板的选择同步一份（仅在元素已存在时）
+  document.querySelectorAll('#bkOwnSeg button').forEach(x => {
+    x.classList.toggle('active', x.dataset.own === myOwn);
+  });
+}
+document.querySelectorAll('#ownSeg button').forEach(b => {
+  b.addEventListener('click', () => setOwn(b.dataset.own));
+});
+
+// 预约板的本体选择（与匹配页独立，默认跟随）
+let bkOwn = myOwn;
+document.querySelectorAll('#bkOwnSeg button').forEach(b => {
+  b.addEventListener('click', () => {
+    bkOwn = b.dataset.own;
+    document.querySelectorAll('#bkOwnSeg button').forEach(x => x.classList.toggle('active', x.dataset.own === bkOwn));
+  });
+});
+
+/* ---------- 游戏与平台选择 ---------- */
+function renderGames() {
+  $('games').innerHTML = GAMES.map(g =>
+    `<button class="pick${myGame && myGame.id === g.id ? ' active' : ''}" data-g="${g.id}">${g.name}<small>${g.size}人开局</small></button>`
+  ).join('');
+}
+function renderPlatforms() {
+  const list = myGame ? myGame.platforms : [];
+  $('platforms').innerHTML = list.map(p =>
+    `<button class="pick${myPlatform === p ? ' active' : ''}" data-p="${p}">${PLATFORM_NAMES[p]}</button>`
+  ).join('');
+}
+$('games').addEventListener('click', e => {
+  const btn = e.target.closest('.pick'); if (!btn) return;
+  myGame = GAMES.find(g => g.id === btn.dataset.g);
+  myPlatform = null;
+  renderGames(); renderPlatforms();
+});
+$('platforms').addEventListener('click', e => {
+  const btn = e.target.closest('.pick'); if (!btn) return;
+  myPlatform = btn.dataset.p;
+  renderPlatforms();
+});
+
+/* ---------- WebSocket 匹配 ---------- */
+function connect() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(`${proto}://${location.host}/ws`);
+  ws.onmessage = e => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'stats') renderStats(msg);
+    if (msg.type === 'queued') {
+      state = 'queued';
+      const g = GAMES.find(x => x.id === msg.game);
+      $('queueTitle').textContent = `正在为你寻找「${g ? g.name : ''}」的搭子（${g ? g.size : 2}人开局）…`;
+      show('queuing');
+    }
+    if (msg.type === 'cancelled') { state = 'idle'; show('lobby'); }
+    if (msg.type === 'matched') {
+      state = 'matched';
+      partnerKey = msg.partner.key || null;
+      renderPartner(msg.partner);
+      // 仪式感：只陈述真实序号，不编数字
+      const seqBox = $('matchSeq');
+      if (msg.seq) {
+        seqBox.style.display = '';
+        seqBox.textContent = msg.seq === 1
+          ? '🎊 本节点开张第一局 · 你们是元老级玩家'
+          : `🎊 本节点第 ${msg.seq} 次成功配对${msg.size > 2 ? ` · ${msg.size} 人局` : ''}`;
+      } else {
+        seqBox.style.display = 'none';
+      }
+      show('matched');
+      toast('🎉 配对成功！');
+    }
+    if (msg.type === 'reported') toast('举报已记录，感谢维护环境 🙏');
+    if (msg.type === 'partner_left') {
+      state = 'idle'; show('lobby');
+      toast('对方已离开，回大厅重新匹配吧');
+    }
+    if (msg.type === 'error') { state = 'idle'; show('lobby'); toast(msg.message || '出错了，请重试'); }
+  };
+  ws.onclose = () => {
+    if (state !== 'idle') { state = 'idle'; show('lobby'); toast('连接已断开，请重新匹配'); }
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(connect, 3000);
+  };
+}
+
+function renderStats(msg) {
+  // 按游戏聚合本节点排队人数
+  const perGame = {};
+  for (const [k, n] of Object.entries(msg.queue || {})) {
+    const gid = k.split('|')[0];
+    perGame[gid] = (perGame[gid] || 0) + n;
+  }
+  const chips = Object.entries(perGame)
+    .filter(([, n]) => n > 0)
+    .map(([gid, n]) => {
+      const g = GAMES.find(x => x.id === gid);
+      return `<div class="stat">${g ? g.name : gid} <b>${n}</b></div>`;
+    }).join('');
+
+  const parts = [];
+
+  // ① 在线人数：人少时用引导语气，不显示刺眼的「0 人」
+  const online = msg.online || 0;
+  if (online <= 1) {
+    parts.push(`<div class="stat">🌱 你是此刻唯一在线的人 · 来开个头</div>`);
+  } else if (online <= 3) {
+    parts.push(`<div class="stat">🟢 在线 <b>${online}</b> 人 · 刚好凑一桌</div>`);
+  } else {
+    parts.push(`<div class="stat">🟢 在线 <b>${online}</b> 人</div>`);
+  }
+
+  // ② 真实亮点：游戏库的丰富度（这个数字只会越来越大，且完全真实）
+  if (GAMES.length) {
+    const platformCount = new Set(GAMES.flatMap(g => g.platforms || [])).size;
+    const sizes = GAMES.map(g => g.size).filter(n => n > 0);
+    const sizeText = sizes.length
+      ? (Math.min(...sizes) === Math.max(...sizes) ? `${sizes[0]} 人局` : `${Math.min(...sizes)}~${Math.max(...sizes)} 人`)
+      : '';
+    parts.push(`<div class="stat" title="游戏库规模（随玩家提名收录而增长）">🎮 <b>${GAMES.length}</b> 款游戏 · ${platformCount} 个平台${sizeText ? ' · ' + sizeText + '开黑' : ''}</div>`);
+  }
+
+  // ③ 匹配成绩：没有记录时讲引导，有记录时讲成绩——绝不编造数字
+  if (msg.honor) {
+    const total = (msg.honor.localMatches || 0) + (msg.honor.crossMatches || 0);
+    const players = msg.honor.matchedPlayers || 0;
+    const days = Math.floor((Date.now() - msg.honor.startedAt) / 86400000);
+    const uptime = days >= 1 ? `已稳定运行 ${days} 天` : '今日新开';
+    if (total === 0) {
+      parts.push(`<div class="stat" title="本节点开张至今的真实配对记录">🌱 本节点${uptime} · 还没有配对记录，第一局等你</div>`);
+    } else {
+      parts.push(`<div class="stat" title="本节点为玩家社区贡献的配对数">⚡ 已促成 <b>${total}</b> 局 · 帮 <b>${players}</b> 位玩家找到搭子 · ${uptime}</div>`);
+    }
+  }
+
+  // ④ 签名存证：没存证时不显示「0 局」，改为「已就绪」
+  if (msg.honor && msg.honor.signing) {
+    const v = msg.honor.verified || 0;
+    if (v > 0) {
+      parts.push(`<div class="stat" title="跨节点配对由双方节点用私钥共同签名，任何人可复核（存证记录不含玩家信息）">🔏 签名存证 <b>${v}</b> 局 · 身份 ${String(msg.honor.nodeId || '').slice(0, 8)}</div>`);
+    } else {
+      parts.push(`<div class="stat" title="跨节点配对由双方节点用私钥共同签名，任何人可复核（存证记录不含玩家信息）">🔏 签名存证已就绪 · 等第一局 · 身份 ${String(msg.honor.nodeId || '').slice(0, 8)}</div>`);
+    }
+  }
+
+  // ⑤ 联邦网络：单节点时讲「可以扩」而不是「只有 1 个节点」
+  if (msg.network) {
+    if ((msg.network.nodes || 0) <= 1) {
+      parts.push(`<div class="stat" title="把本站地址作为 HUB_URL 告诉别人，就能和更多节点共用匹配池">🌐 单节点运行中 · 接入更多节点可扩大匹配池</div>`);
+    } else {
+      parts.push(`<div class="stat">🌐 联邦网络 <b>${msg.network.nodes}</b> 节点 · 跨节点排队 ${msg.network.total}</div>`);
+    }
+  }
+
+  if (msg.network && msg.network.board && msg.network.board.length) {
+    const board = msg.network.board
+      .map((e, i) => {
+        const badge = e.signed ? (e.verified > 0 ? ' 🔏' : ' ⚠️') : '';
+        // 节点名是别的节点主人自己填的（NODE_NAME），必须转义，防恶意节点用名字投 XSS
+        return `${['🥇','🥈','🥉','4.','5.'][i]} ${escapeHtml(e.name)} ×${e.helped}${badge}`;
+      })
+      .join('　');
+    parts.push(`<div class="stat" title="🔏 = 该节点的配对数已由双方签名存证；⚠️ = 尚未启用签名">🏆 节点荣誉榜：${board}</div>`);
+  }
+
+  $('stats').innerHTML = parts.join('') + chips;
+}
+
+function gameName(id) { const g = GAMES.find(x => x.id === id); return g ? g.name : id; }
+function platformName(p) { return PLATFORM_NAMES[p] || p; }
+
+function renderPartner(p) {
+  const micTag = p.mic ? '🎙 有麦' : '⌨️ 无麦';
+  const ownTag = p.own === 'pass'
+    ? '<span class="own-badge pass">🎟 仅通行证</span>'
+    : '<span class="own-badge own">🎮 有本体</span>';
+  $('partnerMeta').innerHTML =
+    `${gameName(p.game)} · ${platformName(p.platform)} · ${escapeHtml(p.nick)} · ${escapeHtml(p.chapter || '进度未填')} · ${micTag}${ownTag}`;
+  $('partnerId').textContent = p.id || '（对方没填 ID，加好友时问一下～）';
+  const isDuo = (GAMES.find(x => x.id === p.game) || {}).size === 2;
+  $('guideBox').innerHTML = isDuo
+    ? `<b>接下来 3 步开玩：</b><br>1. 按平台互加好友（EA 系游戏走 EA App）<br>2. 对方没买游戏：商店搜「${gameName(p.game)} 好友通行证 Friend's Pass」免费下载<br>3. 在游戏主菜单点「在线游玩」→ 邀请好友即可<br><span style="color:#b0a390;">💡 建议开加速器；掉线后房主别退出，重新邀请可回到原进度。</span>`
+    : `<b>接下来开玩：</b><br>1. 用上面的 ID 互加平台好友<br>2. 房主建房后把房间名/密码发给对方<br><span style="color:#b0a390;">💡 建议开加速器，语音推荐 KOOK / 游戏内语音。</span>`;
+}
+
+$('startBtn').addEventListener('click', () => {
+  if (!myGame) { toast('先选一个游戏'); return; }
+  if (!myPlatform) { toast('再选一下你的平台'); return; }
+  const nick = $('nick').value.trim() || '玩家';
+  const id = $('gameId').value.trim();
+  if (!id) { toast('先填一下好友 ID，不然对方找不到你哦'); $('gameId').focus(); return; }
+  localStorage.setItem('it2_nick', nick);
+  localStorage.setItem('it2_gameid', id);
+  ws.send(JSON.stringify({
+    type: 'join', game: myGame.id, platform: myPlatform,
+    nick, id, chapter: $('chapter').value.trim(), mic: $('mic').checked, own: myOwn, token: myToken,
+  }));
+});
+$('cancelBtn').addEventListener('click', () => ws.send(JSON.stringify({ type: 'cancel' })));
+$('doneBtn').addEventListener('click', () => {
+  ws.send(JSON.stringify({ type: 'leave_pair' }));
+  state = 'idle'; show('lobby');
+  toast('已返回大厅，欢迎再来！');
+});
+$('reportBtn').addEventListener('click', () => {
+  if (!partnerKey) { toast('这次没有可举报的对象'); return; }
+  if (!confirm('确定举报这位搭子吗？多次被举报的身份将被禁止匹配。')) return;
+  ws.send(JSON.stringify({ type: 'report', key: partnerKey }));
+});
+$('copyBtn').addEventListener('click', () => {
+  const text = $('partnerId').textContent;
+  const done = () => toast('已复制，快去加好友吧');
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(done);
+  else {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove(); done();
+  }
+});
+
+/* ---------- 分享裂变 ---------- */
+// 独立 try/catch 隔离：即使分享功能初始化异常，也不影响后面的匹配/预约/留言功能
+try {
+  const SHARE_TEXT = '🎮 我在用「联机搭子」随机找联机游戏的搭子——免登录、不存数据、秒配对，支持双人成行等热门联机游戏，还有好友通行证求带。快来一起玩：';
+  let shareCount = parseInt(localStorage.getItem('it2_shares') || '0', 10) || 0;
+
+  function copyText(text, done) {
+    if (navigator.clipboard) return navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    fallbackCopy(text, done);
+  }
+  function fallbackCopy(text, done) {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch { toast('复制失败，请手动复制地址栏链接'); }
+    ta.remove();
+  }
+  async function doShare(source) {
+    const url = location.origin + location.pathname;
+    shareCount++;
+    localStorage.setItem('it2_shares', shareCount);
+    // 优先调起系统原生分享（手机上可直接分享到微信 / QQ）
+    if (navigator.share) {
+      try { await navigator.share({ title: '联机搭子 · 随机匹配', text: SHARE_TEXT, url }); return; }
+      catch (err) { if (err && err.name === 'AbortError') return; /* 用户取消，不降级 */ }
+    }
+    copyText(SHARE_TEXT + '\n' + url, () => toast('分享文案和链接已复制，去粘贴给搭子吧 🎉'));
+  }
+  $('shareBtn').addEventListener('click', () => doShare('header'));
+  $('shareBtn2').addEventListener('click', () => doShare('matched'));
+} catch (e) { if (window.console) console.warn('分享功能初始化失败（不影响其他功能）', e); }
+
+/* ---------- 预约留言板 ---------- */
+const SLOTS = ['今晚 20-23 点', '今晚 23 点后', '明天白天', '明天晚上', '本周六', '本周日', '工作日随时', '时间灵活'];
+const TAGS = ['休闲不肝', '能带萌新', '不骂人', '有麦沟通', '佛系试错', '进度同步', '速通冲关', '只玩一局', '女生局'];
+
+function initBoardForm() {
+  $('bkGame').innerHTML = GAMES.map(g => `<option value="${g.id}">${g.name}（${g.size}人局）</option>`).join('');
+  $('bkSlot').innerHTML = SLOTS.map(s => `<option>${s}</option>`).join('');
+  $('bkTags').innerHTML = TAGS.map(t => `<span class="chip" data-t="${t}">${t}</span>`).join('');
+  $('bkPlatform').innerHTML = '<option>Steam</option>';
+  $('bkGame').addEventListener('change', () => { fillPlatforms(); fillCounts(); });
+  $('bkHave').addEventListener('change', fillCounts);
+  fillPlatforms();
+  fillCounts();
+  $('bkTags').addEventListener('click', e => {
+    const c = e.target.closest('.chip'); if (!c) return;
+    const active = $('bkTags').querySelectorAll('.chip.active');
+    if (!c.classList.contains('active') && active.length >= 4) { toast('最多选 4 个标签'); return; }
+    c.classList.toggle('active');
+  });
+}
+
+// 已有/还缺联动：两者之和必须正好等于该游戏开局人数
+function fillCounts() {
+  const g = GAMES.find(x => x.id === $('bkGame').value);
+  const size = g ? g.size : 2;
+  const haveSel = $('bkHave'), needSel = $('bkNeed');
+
+  // 已有人数：1 ~ (总人数-1)，至少还要缺 1 人这局才有意义
+  const prevHave = parseInt(haveSel.value, 10) || 1;
+  const have = Math.min(Math.max(prevHave, 1), size - 1);
+  haveSel.innerHTML = Array.from({ length: size - 1 }, (_, i) => i + 1)
+    .map(n => `<option value="${n}"${n === have ? ' selected' : ''}>${n} 人</option>`).join('');
+
+  // 还缺人数：固定为 总人数 - 已有，只有唯一解，避免出现"4人局已有3人还缺4人"
+  const need = size - have;
+  needSel.innerHTML = `<option value="${need}" selected>${need} 人</option>`;
+  needSel.disabled = true;
+
+  $('bkSizeHint').textContent = `（${g ? g.name : ''}共 ${size} 人）`;
+}
+function fillPlatforms() {
+  const g = GAMES.find(x => x.id === $('bkGame').value);
+  if (!g) return;
+  $('bkPlatform').innerHTML = g.platforms.map(p => `<option value="${p}">${PLATFORM_NAMES[p]}</option>`).join('');
+}
+
+function bookingCard(b, myTok) {
+  const isMine = false; // 由调用处判断
+  const joined = b.members.length;
+  const full = b.full;
+  const memberStr = b.members.map(m => `${escapeHtml(m.nick)}(${escapeHtml(m.fid)})`).join('、') || '虚位以待';
+  return `<div class="booking-item${full ? ' full' : ''}">
+    <div class="bk-head">
+      <span class="bk-title">${gameName(b.game)} · ${platformName(b.platform)}<span class="cap">${b.slot}</span></span>
+      <span class="bk-meta">已有 ${b.have} 人 · 还缺 ${b.need} 人 ${b.mic ? '· 🎙有麦' : ''}</span>
+    </div>
+    ${b.tags.length ? `<div class="bk-tags">${b.tags.map(t => `<span class="bk-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+    <div class="bk-owner">发起人：<b>${escapeHtml(b.owner.nick)}</b>（ID: ${escapeHtml(b.owner.fid)}）${b.own === 'pass' ? '<span class="own-badge pass">🎟 仅通行证（求带）</span>' : '<span class="own-badge own">🎮 有本体</span>'}</div>
+    <div class="bk-members">已应约：${memberStr}</div>
+    <div class="bk-actions">
+      <button class="bk-join" data-id="${b.id}" ${full ? 'disabled' : ''}>${full ? '已满员' : '我要应约'}</button>
+      <button class="bk-report" data-id="${b.id}">举报</button>
+    </div>
+  </div>`;
+}
+
+async function loadBookings() {
+  try {
+    const r = await fetch('/api/bookings');
+    const list = await r.json();
+    $('bookingList').innerHTML = list.length
+      ? list.map(b => bookingCard(b, myToken)).join('')
+      : '<div class="empty-tip">还没有预约，来发第一条吧</div>';
+  } catch { toast('加载预约列表失败'); }
+}
+
+$('bkPublishBtn').addEventListener('click', async () => {
+  const tags = [...$('bkTags').querySelectorAll('.chip.active')].map(c => c.dataset.t);
+  const body = {
+    token: myToken,
+    game: $('bkGame').value,
+    platform: $('bkPlatform').value,
+    slot: $('bkSlot').value,
+    have: $('bkHave').value,
+    need: $('bkNeed').value,
+    mic: $('bkMic').checked,
+    own: bkOwn,
+    tags,
+    nick: $('nick').value.trim() || '玩家',
+    fid: $('gameId').value.trim(),
+  };
+  if (!body.fid) { toast('先在「即时匹配」页填好昵称和好友 ID'); return; }
+  try {
+    const r = await fetch('/api/bookings', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await r.json();
+    if (!r.ok) { toast(data.error || '发布失败'); return; }
+    toast('预约已发布，24 小时后自动下架');
+    loadBookings();
+  } catch { toast('发布失败，请重试'); }
+});
+
+$('bookingList').addEventListener('click', async e => {
+  const joinBtn = e.target.closest('.bk-join');
+  const reportBtn = e.target.closest('.bk-report');
+  if (joinBtn) {
+    try {
+      const r = await fetch(`/api/bookings/${joinBtn.dataset.id}/join`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: myToken, nick: $('nick').value.trim() || '玩家', fid: $('gameId').value.trim() }),
+      });
+      const data = await r.json();
+      if (!r.ok) { toast(data.error || '应约失败'); return; }
+      toast('应约成功，记得按 ID 加好友哦');
+      loadBookings();
+    } catch { toast('应约失败，请重试'); }
+  }
+  if (reportBtn) {
+    if (!confirm('确定举报这条预约吗？需要多个不同玩家举报才会下架，恶意举报无效。')) return;
+    try {
+      const r = await fetch(`/api/bookings/${reportBtn.dataset.id}/report`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: myToken }),
+      });
+      const data = await r.json();
+      if (!r.ok) { toast(data.error || '举报失败'); return; }
+      toast(data.removed ? '已下架该预约' : '举报已记录');
+      loadBookings();
+    } catch { toast('举报失败，请重试'); }
+  }
+});
+$('bkRefresh').addEventListener('click', loadBookings);
+
+/* ---------- 节点留言板 ---------- */
+const MSG_CHIPS = ['感谢节点主人！', '匹配很快，好用', '建议收录新游戏', '希望能加预约提醒', '页面有点卡'];
+let msgMotd = '';
+
+function renderMsgChips() {
+  $('msgChips').innerHTML = MSG_CHIPS
+    .map(t => `<button class="stat" style="cursor:pointer;border:1px solid rgba(127,127,127,.3);background:transparent;color:inherit;" data-chip="${t}">${t}</button>`)
+    .join('');
+  $('msgChips').querySelectorAll('[data-chip]').forEach(btn => {
+    btn.addEventListener('click', () => { $('msgText').value = btn.dataset.chip; updateMsgCount(); });
+  });
+}
+
+function updateMsgCount() { $('msgCount').textContent = $('msgText').value.length + '/60'; }
+
+function renderMessages(data) {
+  msgMotd = data.motd || '';
+  if (msgMotd) {
+    $('motdBox').classList.remove('hidden');
+    $('motdBox').textContent = '📢 节点主人说：' + msgMotd;
+  } else {
+    $('motdBox').classList.add('hidden');
+  }
+  const list = data.list || [];
+  if (!list.length) { $('msgList').innerHTML = '<div class="empty-tip">还没有留言，来做第一个和节点主人说话的人</div>'; return; }
+  $('msgList').innerHTML = list.map(m => `
+    <div style="border-top:1px solid rgba(127,127,127,.18);padding:8px 0;font-size:13px;line-height:1.6;">
+      <div style="display:flex;justify-content:space-between;gap:8px;color:var(--sub);font-size:12px;">
+        <span>${escapeHtml(m.nick)}</span>
+        <span>
+          ${new Date(m.createdAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          <a href="javascript:void(0)" data-report="${m.id}" style="color:inherit;margin-left:6px;text-decoration:underline;">举报</a>
+        </span>
+      </div>
+      <div>${escapeHtml(m.text)}</div>
+    </div>`).join('');
+  $('msgList').querySelectorAll('[data-report]').forEach(a => {
+    a.addEventListener('click', () => reportMessage(a.dataset.report));
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+let lastMsgSignature = '';
+async function loadMessages() {
+  try {
+    const r = await fetch('/api/messages');
+    if (!r.ok) return;
+    const data = await r.json();
+    // 内容没变就不重渲染，避免 30 秒一刷把页面滚动位置打断
+    const sig = JSON.stringify([data.motd || '', (data.list || []).map(m => [m.id, m.text, m.createdAt])]);
+    if (sig === lastMsgSignature) return;
+    lastMsgSignature = sig;
+    renderMessages(data);
+  } catch {}
+}
+
+async function sendMessage() {
+  const text = $('msgText').value.trim();
+  if (!text) { toast('写点内容再发吧'); return; }
+  $('msgSend').disabled = true;
+  try {
+    const r = await fetch('/api/messages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: myToken, nick: $('nick').value || '玩家', text }),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok) {
+      $('msgText').value = ''; updateMsgCount();
+      toast('留言已送达，谢谢你的反馈！');
+      loadMessages();
+    } else {
+      toast(d.error || '发送失败，稍后再试');
+    }
+  } catch { toast('网络异常，稍后再试'); }
+  finally { $('msgSend').disabled = false; }
+}
+
+async function reportMessage(id) {
+  try {
+    const r = await fetch('/api/messages/' + id + '/report', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: myToken }),
+    });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok) { toast(d.removed ? '已下架该留言' : '已举报，感谢反馈'); loadMessages(); }
+    else toast(d.error || '举报失败');
+  } catch { toast('网络异常'); }
+}
+
+$('msgText').addEventListener('input', updateMsgCount);
+$('msgSend').addEventListener('click', sendMessage);
+renderMsgChips();
+updateMsgCount();
+loadMessages();
+setInterval(loadMessages, 30000); // 每 30 秒刷新一次留言
+
+/* ---------- 游戏提名（投票） ---------- */
+let nomThreshold = 3;
+let nomCandidates = [];
+function renderNomDetail() {
+  const sel = $('nomSelect');
+  const box = $('nomDetail');
+  if (!box) return;
+  const c = nomCandidates.find(x => x.id === sel.value);
+  if (!c) { box.innerHTML = '<div class="empty-tip">请选择一款游戏</div>'; return; }
+  const pct = c.added ? 100 : Math.min(100, Math.round((c.votes / nomThreshold) * 100));
+  const badge = c.added
+    ? '<span class="own-badge own">✅ 已收录</span>'
+    : (c.ready ? '<span class="own-badge pass">🔥 已达标，等节点主人收录</span>' : '');
+  const label = c.added ? '已在匹配库' : (c.voted ? '已提名' : '提名这个游戏');
+  box.innerHTML = `<div class="booking-item${c.added ? ' full' : ''}">
+    <div class="bk-head">
+      <span class="bk-title">${c.name}${badge}</span>
+      <span class="bk-meta">${c.size} 人局 · ${c.platforms.map(p => PLATFORM_NAMES[p] || p).join(' / ')}</span>
+    </div>
+    <div style="margin-top:8px;background:#f3efe7;border-radius:6px;height:8px;overflow:hidden;">
+      <div style="width:${pct}%;height:100%;background:var(--accent);transition:width .3s;"></div>
+    </div>
+    <div class="bk-meta" style="margin-top:6px;">${c.votes} / ${nomThreshold} 票</div>
+    <div class="bk-actions">
+      <button class="bk-join" data-nom="${c.id}" ${(c.added || c.voted) ? 'disabled' : ''}>${label}</button>
+    </div>
+  </div>`;
+}
+async function loadNominations() {
+  try {
+    const r = await fetch('/api/nominations?token=' + encodeURIComponent(myToken));
+    const d = await r.json();
+    nomThreshold = d.threshold || 3;
+    $('nomThreshold').textContent = nomThreshold;
+    const list = d.list || [];
+    // 节点主人刚收录了新游戏：同步刷新本地游戏库，不用用户手动刷新页面
+    const fetchedAt = list.filter(c => c.added && !GAMES.some(g => g.id === c.id));
+    if (fetchedAt.length) {
+      try {
+        GAMES = await (await fetch('/api/games')).json();
+        renderGames();
+        const cur = $('bkGame').value;
+        $('bkGame').innerHTML = GAMES.map(g => `<option value="${g.id}">${g.name}（${g.size}人局）</option>`).join('');
+        if (GAMES.some(g => g.id === cur)) $('bkGame').value = cur;
+        fillPlatforms(); fillCounts();
+        toast('游戏库已更新，去「匹配」页看看新游戏');
+      } catch {}
+    }
+    nomCandidates = list;
+    const sel = $('nomSelect');
+    if (!list.length) {
+      sel.innerHTML = '<option value="">暂时没有候选游戏</option>';
+      $('nomDetail').innerHTML = '<div class="empty-tip">暂时没有候选游戏</div>';
+      return;
+    }
+    const prev = sel.value;
+    sel.innerHTML = list.map(c => `<option value="${c.id}">${c.name}（${c.size}人局）${c.added ? ' ✅已收录' : (c.ready ? ' 🔥已达标' : '')}</option>`).join('');
+    if (list.some(c => c.id === prev)) sel.value = prev;
+    renderNomDetail();
+  } catch {
+    $('nomDetail').innerHTML = '<div class="empty-tip">加载失败，稍后再试</div>';
+  }
+}
+try {
+  $('nomSelect').addEventListener('change', renderNomDetail);
+  $('nomDetail').addEventListener('click', async e => {
+    const btn = e.target.closest('[data-nom]');
+    if (!btn || btn.disabled) return;
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/nominations/' + btn.dataset.nom + '/vote', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: myToken }),
+      });
+      const d = await r.json();
+      if (!r.ok) { toast(d.error || '提名失败'); btn.disabled = false; return; }
+      toast(d.already ? '你已经提名过这款了' : (d.ready ? '提名成功！这款游戏已经达标 🎉' : '提名成功，感谢！'));
+      loadNominations();
+    } catch { toast('网络异常，稍后再试'); btn.disabled = false; }
+  });
+  $('nomRefresh').addEventListener('click', loadNominations);
+} catch (e) { if (window.console) console.warn('提名模块初始化失败（不影响其他功能）', e); }
+
+/* ---------- 启动 ---------- */
+Promise.all([
+  fetch('/api/games').then(r => r.json()),
+  fetch('/api/info').then(r => r.json()),
+]).then(([games, info]) => {
+  GAMES = games;
+  renderGames();
+  initBoardForm();
+  loadNominations(); // 留言页里的「想玩什么游戏」投票
+  $('nodeName').textContent = `🖥 节点：${info.node}${info.federated ? '（已接入联邦网络）' : '（独立运行）'}${info.signing ? ' · 🔏 身份 ' + String(info.nodeId || '').slice(0, 12) : ''}`;
+  $('cmdHubUrl').textContent = location.origin;
+  $('copyDeploy').addEventListener('click', () => {
+    const cmd = `git clone 本项目 && cd it2-match\nnpm install\nSIGNING=1 PORT=3001 NODE_NAME="你的节点名" HUB_URL=${location.origin} npm start`;
+    (navigator.clipboard ? navigator.clipboard.writeText(cmd) : Promise.reject())
+      .then(() => { $('copyHint').textContent = '✅ 已复制，去服务器粘贴即可'; })
+      .catch(() => { $('copyHint').textContent = '复制失败，请手动选中文本复制'; });
+  });
+}).catch(() => {});
+
+$('nick').value = localStorage.getItem('it2_nick') || '';
+$('gameId').value = localStorage.getItem('it2_gameid') || '';
+setOwn(myOwn); // 恢复上次选择的本体状态
+connect();
+</script>
+</body>
+</html>
