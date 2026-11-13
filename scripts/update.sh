@@ -3,14 +3,14 @@
 # 一键更新脚本：备份 → 覆盖新文件 → 装依赖 → 重启 → 健康检查
 # 健康检查失败会自动回滚到更新前版本并再次重启。
 #
-# 用法（在服务器上，it2-match 目录内或任意位置执行）：
+# 用法（在服务器上，coop-match 目录内或任意位置执行）：
 #   bash scripts/update.sh /path/to/new-version/          # 新代码目录
 #   bash scripts/update.sh                                # 不传目录 = 已用 git pull 拉好新代码，只做备份+重启+检查
 #
 # 可选环境变量：
 #   PORT=3000                 健康检查端口（默认 3000）
-#   SYSTEMD_SERVICE=it2match  systemd 服务名（配置了就用 systemctl 重启）
-#   （检测到 pm2 且有 it2-match 应用时优先用 pm2 restart）
+#   SYSTEMD_SERVICE=coop-match  systemd 服务名（配置了就用 systemctl 重启）
+#   （检测到 pm2 且有 coop-match 应用时优先用 pm2 restart）
 # ============================================================
 set -uo pipefail
 
@@ -46,8 +46,8 @@ fi
 
 echo "==> 3/5 安装依赖（仅当 package.json 有变化时才真正联网）"
 cd "$APP_DIR"
-cp -f "$BACKUP_DIR/package.json" /tmp/it2-pkg-old.json 2>/dev/null || true
-if ! cmp -s package.json /tmp/it2-pkg-old.json 2>/dev/null; then
+cp -f "$BACKUP_DIR/package.json" /tmp/coop-pkg-old.json 2>/dev/null || true
+if ! cmp -s package.json /tmp/coop-pkg-old.json 2>/dev/null; then
   npm install --omit=dev || { echo "    npm install 失败，回滚"; ROLLBACK=1; }
 else
   echo "    package.json 未变化，跳过"
@@ -55,8 +55,8 @@ fi
 
 echo "==> 4/5 重启服务"
 restart() {
-  if command -v pm2 >/dev/null 2>&1 && pm2 list 2>/dev/null | grep -q "it2-match"; then
-    pm2 restart it2-match && return 0
+  if command -v pm2 >/dev/null 2>&1 && pm2 list 2>/dev/null | grep -qE "coop-match|it2-match"; then
+    pm2 restart coop-match && return 0
   fi
   if [ -n "${SYSTEMD_SERVICE:-}" ]; then
     systemctl restart "$SYSTEMD_SERVICE" && return 0

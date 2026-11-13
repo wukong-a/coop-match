@@ -973,7 +973,7 @@ Promise.all([
   $('nodeName').textContent = `🖥 节点：${info.node}${info.federated ? '（已接入联邦网络）' : '（独立运行）'}${info.signing ? ' · 🔏 身份 ' + String(info.nodeId || '').slice(0, 12) : ''}`;
   $('cmdHubUrl').textContent = location.origin;
   $('copyDeploy').addEventListener('click', () => {
-    const cmd = `git clone 本项目 && cd it2-match\nnpm install\nSIGNING=1 PORT=3001 NODE_NAME="你的节点名" HUB_URL=${location.origin} npm start`;
+    const cmd = `git clone https://github.com/wukong-a/coop-match.git && cd coop-match\nnpm install\nSIGNING=1 PORT=3001 NODE_NAME="你的节点名" HUB_URL=${location.origin} npm start`;
     (navigator.clipboard ? navigator.clipboard.writeText(cmd) : Promise.reject())
       .then(() => { $('copyHint').textContent = '✅ 已复制，去服务器粘贴即可'; })
       .catch(() => { $('copyHint').textContent = '复制失败，请手动选中文本复制'; });
