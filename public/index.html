@@ -691,17 +691,19 @@ function fillPlatforms() {
 }
 
 function bookingCard(b, myTok) {
-  const isMine = false; // 由调用处判断
   const joined = b.members.length;
   const full = b.full;
-  const memberStr = b.members.map(m => `${escapeHtml(m.nick)}(${escapeHtml(m.fid)})`).join('、') || '虚位以待';
+  // 没应约的路人看不到任何人的好友 ID；应约后服务端才回 ID
+  const memberStr = b.involved
+    ? (b.members.map(m => `${escapeHtml(m.nick)}(${escapeHtml(m.fid)})`).join('、') || '虚位以待')
+    : (b.members.map(m => escapeHtml(m.nick)).join('、') || '虚位以待');
   return `<div class="booking-item${full ? ' full' : ''}">
     <div class="bk-head">
       <span class="bk-title">${gameName(b.game)} · ${platformName(b.platform)}<span class="cap">${b.slot}</span></span>
       <span class="bk-meta">已有 ${b.have} 人 · 还缺 ${b.need} 人 ${b.mic ? '· 🎙有麦' : ''}</span>
     </div>
     ${b.tags.length ? `<div class="bk-tags">${b.tags.map(t => `<span class="bk-tag">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
-    <div class="bk-owner">发起人：<b>${escapeHtml(b.owner.nick)}</b>（ID: ${escapeHtml(b.owner.fid)}）${b.own === 'pass' ? '<span class="own-badge pass">🎟 仅通行证（求带）</span>' : '<span class="own-badge own">🎮 有本体</span>'}</div>
+    <div class="bk-owner">发起人：<b>${escapeHtml(b.owner.nick)}</b>（ID: ${b.involved ? escapeHtml(b.owner.fid) : '应约后可见'}）${b.own === 'pass' ? '<span class="own-badge pass">🎟 仅通行证（求带）</span>' : '<span class="own-badge own">🎮 有本体</span>'}</div>
     <div class="bk-members">已应约：${memberStr}</div>
     <div class="bk-actions">
       <button class="bk-join" data-id="${b.id}" ${full ? 'disabled' : ''}>${full ? '已满员' : '我要应约'}</button>
@@ -712,7 +714,7 @@ function bookingCard(b, myTok) {
 
 async function loadBookings() {
   try {
-    const r = await fetch('/api/bookings');
+    const r = await fetch('/api/bookings?token=' + encodeURIComponent(myToken));
     const list = await r.json();
     $('bookingList').innerHTML = list.length
       ? list.map(b => bookingCard(b, myToken)).join('')
