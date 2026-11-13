@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>联机搭子 · 双人成行/双影奇境/胡闹厨房随机匹配</title>
-<meta name="description" content="联机搭子：免登录找人一起玩双人成行、双影奇境、胡闹厨房、逃出生天等双人合作游戏。随机匹配、预约组队、联邦节点互通，不存数据，打开就能玩。">
-<meta name="keywords" content="联机搭子,双人成行,双影奇境,胡闹厨房,逃出生天,双人游戏,联机匹配,找队友,合作游戏">
-<meta property="og:title" content="联机搭子 · 随机匹配">
+<title>游戏搭子 · 双人成行/双影奇境/胡闹厨房随机匹配</title>
+<meta name="description" content="游戏搭子：免登录找人一起玩双人成行、双影奇境、胡闹厨房、逃出生天等双人合作游戏。随机匹配、预约组队、联邦节点互通，不存数据，打开就能玩。">
+<meta name="keywords" content="游戏搭子,双人成行,双影奇境,胡闹厨房,逃出生天,双人游戏,联机匹配,找队友,合作游戏">
+<meta property="og:title" content="游戏搭子 · 随机匹配">
 <meta property="og:description" content="免登录找人一起玩双人合作游戏：双人成行、双影奇境、胡闹厨房等。随机匹配、预约组队，打开就能玩。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://yx.niuniu94.xyz/">
@@ -137,13 +137,13 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>🎮 联机搭子 · 随机匹配</h1>
+    <h1>🎮 游戏搭子 · 随机匹配</h1>
     <p>找搭子一起开黑 —— 免登录 · 不存数据 · 用完即走</p>
     <button class="share-btn" id="shareBtn">📣 分享给搭子，匹配更快</button>
   </header>
   <noscript>
     <div style="padding:16px;line-height:1.8;font-size:14px;">
-      <p>联机搭子是一个免登录的双人合作游戏匹配工具，帮你找到一起玩游戏的搭子。</p>
+      <p>游戏搭子是一个免登录的双人合作游戏匹配工具，帮你找到一起玩游戏的搭子。</p>
       <p>支持的游戏：双人成行、双影奇境、逃出生天、传送门2、胡闹厨房2、深岩银河、恐鬼症、森林之子、饥荒联机版、英灵神殿、幻兽帕鲁、博德之门3、求生之路2，以及玩家投票收录的更多游戏。</p>
       <p>玩法：选游戏、选平台，点开始匹配，系统会把同样在排队的人配成一对；也可以发预约，约好时间一起玩。支持 Steam、EA App、Epic、PS、Xbox、Switch 等平台。任何人都可以自建节点加入联邦网络，所有节点共用一个匹配池。</p>
       <p>本站免登录，不收集个人信息，不保存聊天记录。请开启 JavaScript 后使用完整功能。</p>
@@ -299,7 +299,7 @@
       </div>
       <p style="margin:6px 0;line-height:1.7;">
         不会用命令行？点上面两个按钮，跟着页面点几下就能部署自己的节点（免费），拿到公开网址发给朋友。
-        <a href="https://github.com/wukong-a/coop-match/blob/main/%E8%81%94%E6%9C%BA%E6%90%AD%E5%AD%90-%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B.md" target="_blank" rel="noopener">一步步部署教程 →</a>
+        <a href="https://github.com/wukong-a/coop-match/blob/main/%E6%B8%B8%E6%88%8F%E6%90%AD%E5%AD%90-%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B.md" target="_blank" rel="noopener">一步步部署教程 →</a>
       </p>
       <p style="margin:8px 0 6px;line-height:1.7;">
         每多一个节点，网络就多一分匹配速度。自建节点会出现在全网「节点荣誉榜」上，
@@ -344,17 +344,17 @@ const PLATFORM_NAMES = { steam: 'Steam', ea: 'EA App', epic: 'Epic', ps: 'PS', x
 let GAMES = [];
 let myGame = null;      // 当前选中的游戏对象
 let myPlatform = null;
-let myOwn = localStorage.getItem('it2_own') === 'pass' ? 'pass' : 'own'; // 是否有游戏本体
+let myOwn = localStorage.getItem('coop_own') === 'pass' ? 'pass' : 'own'; // 是否有游戏本体
 
 let ws = null;
 let state = 'idle';
 let reconnectTimer = null;
 let partnerKey = null;
 
-let myToken = localStorage.getItem('it2_token');
+let myToken = localStorage.getItem('coop_token');
 if (!myToken) {
   myToken = crypto.randomUUID ? crypto.randomUUID() : 't' + Date.now() + Math.random().toString(36).slice(2);
-  localStorage.setItem('it2_token', myToken);
+  localStorage.setItem('coop_token', myToken);
 }
 
 const $ = id => document.getElementById(id);
@@ -387,7 +387,7 @@ $('tabMsg').addEventListener('click', () => switchTab('msg'));
 /* ---------- 是否有游戏本体 ---------- */
 function setOwn(v) {
   myOwn = v === 'pass' ? 'pass' : 'own';
-  localStorage.setItem('it2_own', myOwn);
+  localStorage.setItem('coop_own', myOwn);
   document.querySelectorAll('#ownSeg button').forEach(b => {
     b.classList.toggle('active', b.dataset.own === myOwn);
   });
@@ -584,8 +584,8 @@ $('startBtn').addEventListener('click', () => {
   const nick = $('nick').value.trim() || '玩家';
   const id = $('gameId').value.trim();
   if (!id) { toast('先填一下好友 ID，不然对方找不到你哦'); $('gameId').focus(); return; }
-  localStorage.setItem('it2_nick', nick);
-  localStorage.setItem('it2_gameid', id);
+  localStorage.setItem('coop_nick', nick);
+  localStorage.setItem('coop_gameid', id);
   ws.send(JSON.stringify({
     type: 'join', game: myGame.id, platform: myPlatform,
     nick, id, chapter: $('chapter').value.trim(), mic: $('mic').checked, own: myOwn, token: myToken,
@@ -616,8 +616,8 @@ $('copyBtn').addEventListener('click', () => {
 /* ---------- 分享裂变 ---------- */
 // 独立 try/catch 隔离：即使分享功能初始化异常，也不影响后面的匹配/预约/留言功能
 try {
-  const SHARE_TEXT = '🎮 我在用「联机搭子」随机找联机游戏的搭子——免登录、不存数据、秒配对，支持双人成行等热门联机游戏，还有好友通行证求带。快来一起玩：';
-  let shareCount = parseInt(localStorage.getItem('it2_shares') || '0', 10) || 0;
+  const SHARE_TEXT = '🎮 我在用「游戏搭子」随机找联机游戏的搭子——免登录、不存数据、秒配对，支持双人成行等热门联机游戏，还有好友通行证求带。快来一起玩：';
+  let shareCount = parseInt(localStorage.getItem('coop_shares') || '0', 10) || 0;
 
   function copyText(text, done) {
     if (navigator.clipboard) return navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
@@ -632,10 +632,10 @@ try {
   async function doShare(source) {
     const url = location.origin + location.pathname;
     shareCount++;
-    localStorage.setItem('it2_shares', shareCount);
+    localStorage.setItem('coop_shares', shareCount);
     // 优先调起系统原生分享（手机上可直接分享到微信 / QQ）
     if (navigator.share) {
-      try { await navigator.share({ title: '联机搭子 · 随机匹配', text: SHARE_TEXT, url }); return; }
+      try { await navigator.share({ title: '游戏搭子 · 随机匹配', text: SHARE_TEXT, url }); return; }
       catch (err) { if (err && err.name === 'AbortError') return; /* 用户取消，不降级 */ }
     }
     copyText(SHARE_TEXT + '\n' + url, () => toast('分享文案和链接已复制，去粘贴给搭子吧 🎉'));
@@ -980,8 +980,8 @@ Promise.all([
   });
 }).catch(() => {});
 
-$('nick').value = localStorage.getItem('it2_nick') || '';
-$('gameId').value = localStorage.getItem('it2_gameid') || '';
+$('nick').value = localStorage.getItem('coop_nick') || '';
+$('gameId').value = localStorage.getItem('coop_gameid') || '';
 setOwn(myOwn); // 恢复上次选择的本体状态
 connect();
 </script>
