@@ -480,23 +480,27 @@ setInterval(() => {
 }, 60 * 60 * 1000).unref();
 loadBookingsFromDisk();
 
-function bookingView(b) {
+function bookingView(b, token) {
+  // 好友 ID 只对当事人可见（发起人或已应约的人）：路人看不到 ID，应约按钮才有意义
+  const involved = !!token && (token === b.ownerToken || b.members.some(m => m.token === token));
   return {
     id: b.id, game: b.game, platform: b.platform, slot: b.slot,
     have: b.have, need: b.need, mic: b.mic, tags: b.tags, own: b.own || 'own',
-    owner: { nick: b.owner.nick, fid: b.owner.fid },
-    members: b.members.map(m => ({ nick: m.nick, fid: m.fid })),
+    owner: { nick: b.owner.nick, fid: involved ? b.owner.fid : '' },
+    members: b.members.map(m => ({ nick: m.nick, fid: involved ? m.fid : '' })),
     createdAt: b.createdAt, expiresAt: b.expiresAt,
     full: b.members.length >= b.need,
+    involved,
   };
 }
 
 app.get('/api/bookings', (req, res) => {
   const now = Date.now();
+  const token = String(req.query.token || '').slice(0, 64);
   const list = [...bookings.values()]
     .filter(b => b.expiresAt > now)
     .sort((a, b) => b.createdAt - a.createdAt)
-    .map(bookingView);
+    .map(b => bookingView(b, token));
   res.json(list);
 });
 
@@ -557,7 +561,7 @@ app.post('/api/bookings', (req, res) => {
   };
   bookings.set(booking.id, booking);
   saveBookingsToDisk();
-  res.json(bookingView(booking));
+  res.json(bookingView(booking, token));
 });
 
 app.post('/api/bookings/:id/join', (req, res) => {
@@ -578,7 +582,7 @@ app.post('/api/bookings/:id/join', (req, res) => {
   if (!fid) return res.status(400).json({ error: '请先在匹配页填好好友 ID（不能含链接）' });
   b.members.push({ nick, fid, token });
   saveBookingsToDisk();
-  res.json(bookingView(b));
+  res.json(bookingView(b, token));
 });
 
 app.post('/api/bookings/:id/report', (req, res) => {
