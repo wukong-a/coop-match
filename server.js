@@ -1,5 +1,5 @@
 /**
- * 联机搭子随机匹配工具 - 服务端（多游戏 + 联邦 + 防滥用）
+ * 游戏搭子随机匹配工具 - 服务端（多游戏 + 联邦 + 防滥用）
  *
  * 队列键 = 游戏 × 平台，凑满该游戏的开局人数即配对。
  * 每个实例既是独立的匹配服务，也可以作为节点接入联邦网络：
@@ -1567,7 +1567,7 @@ wss.on('connection', (ws, req) => {
 if (HUB_URL) hubConnect();
 
 server.listen(PORT, BIND, () => {
-  console.log(`联机搭子匹配节点已启动: http://localhost:${PORT} (监听 ${BIND})`);
+  console.log(`游戏搭子匹配节点已启动: http://localhost:${PORT} (监听 ${BIND})`);
   console.log(`节点名称: ${NODE_NAME} | 收录游戏: ${GAMES.length} 款`);
   console.log(HUB_URL ? `联邦模式: 已指向枢纽 ${HUB_URL}` : '独立模式: 未接入联邦（设置 HUB_URL 可加入网络）');
   if (SIGNING) {
