@@ -14,4 +14,4 @@ services:
       - key: HUB_URL
         value: https://yx.niuniu94.xyz
       - key: NODE_NAME
-        value: 联机搭子
+        value: 游戏搭子
